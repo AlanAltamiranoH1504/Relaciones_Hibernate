@@ -16,10 +16,15 @@ public class Cliente {
     //Relacion OneToMany- Unidireccional → Un cliente tiene varias Direcciones
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "cliente_id")
-    List<Direccion> direcciones = new ArrayList<>();
+    private List<Direccion> direcciones = new ArrayList<>();
+
     //Relacion OneToMany - Bidireccional → Un cliente tiene varios facturas
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "cliente", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER, mappedBy = "cliente")
     private List<Factura> facturas = new ArrayList<>();
+
+    //Relacion OneToOne con Detalle → Bidireccional: Un Cliente tiene un Detalle
+    @OneToOne(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private Detalle detalle;
 
     //Constructores
     public Cliente(){}
@@ -73,6 +78,12 @@ public class Cliente {
     public void setFacturas(List<Factura> facturas){
         this.facturas = facturas;
     }
+    public Detalle getDetalle() {
+        return this.detalle;
+    }
+    public void setDetalle(Detalle detalle){
+        this.detalle = detalle;
+    }
 
     //Metodo toString
     @Override
@@ -83,6 +94,7 @@ public class Cliente {
                 ", apellidos='" + apellidos + '\'' +
                 ", direcciones='" + direcciones + '\'' +
                 ", facturas='" + facturas + '\'' +
+                ", detalles='" + detalle + '\'' +
                 '}';
     }
 }

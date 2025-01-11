@@ -2,6 +2,8 @@ package altamirano.hernandez.asociaciones_springboot2.entities;
 
 import jakarta.persistence.*;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "facturas")
 public class Factura {
@@ -59,5 +61,18 @@ public class Factura {
                 ", descripcion='" + descripcion + '\'' +
                 ", total=" + total +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Factura factura = (Factura) o;
+        return id == factura.id && total == factura.total && Objects.equals(descripcion, factura.descripcion) && Objects.equals(cliente, factura.cliente);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, descripcion, total, cliente);
     }
 }
