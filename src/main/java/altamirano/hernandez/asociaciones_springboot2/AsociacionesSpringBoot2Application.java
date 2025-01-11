@@ -1,22 +1,14 @@
 package altamirano.hernandez.asociaciones_springboot2;
 
-import altamirano.hernandez.asociaciones_springboot2.entities.Cliente;
-import altamirano.hernandez.asociaciones_springboot2.entities.Detalle;
-import altamirano.hernandez.asociaciones_springboot2.entities.Direccion;
-import altamirano.hernandez.asociaciones_springboot2.entities.Factura;
-import altamirano.hernandez.asociaciones_springboot2.repositories.IClienteDetallesRepository;
-import altamirano.hernandez.asociaciones_springboot2.repositories.IClienteRepository;
-import altamirano.hernandez.asociaciones_springboot2.repositories.IFacturaRepository;
+import altamirano.hernandez.asociaciones_springboot2.entities.*;
+import altamirano.hernandez.asociaciones_springboot2.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 @SpringBootApplication
 public class AsociacionesSpringBoot2Application implements CommandLineRunner {
@@ -27,6 +19,10 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
     private IFacturaRepository iFacturaRepository;
     @Autowired
     private IClienteDetallesRepository iClienteDetallesRepository;
+    @Autowired
+    private IEstudianteRepository iEstudianteRepository;
+    @Autowired
+    private ICursoRepository iCursoRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(AsociacionesSpringBoot2Application.class, args);
@@ -34,7 +30,7 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        OneToOneBidireccional();
+        removeCurso();
     }
 
     //Metodo manyToOne
@@ -196,5 +192,50 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
         iClienteRepository.save(cliente18);
         System.out.println("Nuevo Cliente 18 con Detalles nuevos");
         System.out.println("cliente18 = " + cliente18);
+    }
+
+    //Metodo ManyToMany entre Estudiante y Curso → Unidireccional
+    public void manyToManyUni(){
+        Estudiante estudiante = new Estudiante("Alan", "Altamirano Hernandez");
+        Curso curso1 = new Curso("Java", "Global Mentoring");
+        Curso curso2 = new Curso("Spring Boot", "Andres");
+
+        estudiante.getCursos().add(curso1);
+        estudiante.getCursos().add(curso2);
+        iEstudianteRepository.save(estudiante);
+        System.out.println("Estudiante nuevo on nuevos cursos");
+    }
+
+    //Metodo ManyToMany entre estudiante y cursos → Agrega Curso a Estudiante ya existente
+    public void manyToManyById(){
+        Estudiante estudiante3 = iEstudianteRepository.findById(3).orElse(null);
+
+        if (estudiante3 != null){
+            Curso cursoNode = iCursoRepository.findById(1).orElse(null);
+            Curso cursoJs = new Curso("JS", "Juan Pablo");
+            estudiante3.getCursos().add(cursoNode);
+            estudiante3.getCursos().add(cursoJs);
+            iEstudianteRepository.save(estudiante3);
+            System.out.println("Estudiante con ID 3 con Nuevo Curso con Id 1 y nuevo JS");
+            System.out.println("estudiante3 = " + estudiante3);
+        }
+    }
+
+    //Metodo ManyToMany entre estudiante y curso → Eliminar un curso de un estudiante
+    public void removeCurso(){
+        Estudiante estudiante3 = iEstudianteRepository.findById(3).orElse(null);
+
+        if (estudiante3 != null){
+            var curso = iCursoRepository.findById(5).orElse(null);
+            Iterator<Curso> cursos = estudiante3.getCursos().iterator();
+            while (cursos.hasNext()){
+                Curso cursoEncontrado = cursos.next();
+                if (cursoEncontrado.getNombre().equals(curso.getNombre())){
+                    cursos.remove();
+                }
+            }
+        }
+        iEstudianteRepository.save(estudiante3);
+        System.out.println("Curso eliminado");
     }
 }
