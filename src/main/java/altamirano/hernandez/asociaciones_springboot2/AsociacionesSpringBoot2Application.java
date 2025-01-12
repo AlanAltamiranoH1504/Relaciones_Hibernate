@@ -30,7 +30,7 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        removeCurso();
+        removeCursoManyToMany();
     }
 
     //Metodo manyToOne
@@ -171,6 +171,7 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
     }
 
     //Metodo OneToOne entre Cliente y ClienteDetalles con Cliente Existente (unidireccional)
+    @Transactional
     public void OneToOneById(){
         Cliente clienteEncontrado = iClienteRepository.findById(1).orElse(null);
         if (clienteEncontrado != null){
@@ -183,6 +184,7 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
     }
 
     //Metodo OneToOne entre Cliente y ClienteDetalles Bidireccional
+    @Transactional
     public void OneToOneBidireccional(){
         Cliente cliente18 = new Cliente("Lazaro", "Hernandez Hernandez");
         Detalle detalleCliente18 = new Detalle(false, 0);
@@ -195,6 +197,7 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
     }
 
     //Metodo ManyToMany entre Estudiante y Curso → Unidireccional
+    @Transactional
     public void manyToManyUni(){
         Estudiante estudiante = new Estudiante("Alan", "Altamirano Hernandez");
         Curso curso1 = new Curso("Java", "Global Mentoring");
@@ -207,6 +210,7 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
     }
 
     //Metodo ManyToMany entre estudiante y cursos → Agrega Curso a Estudiante ya existente
+    @Transactional
     public void manyToManyById(){
         Estudiante estudiante3 = iEstudianteRepository.findById(3).orElse(null);
 
@@ -222,11 +226,12 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
     }
 
     //Metodo ManyToMany entre estudiante y curso → Eliminar un curso de un estudiante
+    @Transactional
     public void removeCurso(){
-        Estudiante estudiante3 = iEstudianteRepository.findById(3).orElse(null);
+        Estudiante estudiante3 = iEstudianteRepository.findById(2).orElse(null);
 
         if (estudiante3 != null){
-            var curso = iCursoRepository.findById(5).orElse(null);
+            var curso = iCursoRepository.findById(4).orElse(null);
             Iterator<Curso> cursos = estudiante3.getCursos().iterator();
             while (cursos.hasNext()){
                 Curso cursoEncontrado = cursos.next();
@@ -237,5 +242,59 @@ public class AsociacionesSpringBoot2Application implements CommandLineRunner {
         }
         iEstudianteRepository.save(estudiante3);
         System.out.println("Curso eliminado");
+    }
+
+    //Metodo ManyToMany (bidireccional) → Agregar nuevo curso y a ese cursos varios estudiantes
+    @Transactional
+    public void manyToManyAddEstudiantesParaCurso(){
+        Estudiante estudiante1 = new Estudiante("Alan", "Altamirano Hernandez");
+        Estudiante estudiante2 = new Estudiante("Vanessa Adriana", "Rivera Garcia");
+        Curso cursoCSS = new Curso("CSS", "Juan Pablo");
+
+        //Guardamos curso a estudiantes y estudiantes a curso
+        estudiante1.addCurso(cursoCSS);
+        estudiante2.addCurso(cursoCSS);
+        cursoCSS.addEstudiante(estudiante1);
+        cursoCSS.addEstudiante(estudiante2);
+
+        //Aplicamos la persistencia
+        iEstudianteRepository.saveAll(Arrays.asList(estudiante1, estudiante2));
+        iCursoRepository.save(cursoCSS);
+        System.out.println("Alumnos Guardados y Curso CSS guardado");
+    }
+
+    //Metodo ManyToMany que agregar un curso a un estudiante
+    public void manyToManyAgregarCursoAEstudiante(){
+        Estudiante estudiante3 = iEstudianteRepository.findById(3).orElse(null);
+        if (estudiante3 != null){
+            Curso cursoCSS = iCursoRepository.findById(5).orElse(null);
+            if (cursoCSS != null){
+                estudiante3.addCurso(cursoCSS);
+                cursoCSS.addEstudiante(estudiante3);
+
+                iEstudianteRepository.save(estudiante3);
+                iCursoRepository.save(cursoCSS);
+                System.out.println("Estudiante agregado al Curso CSS");
+            }
+        }
+    }
+
+    //Metodo que remueve un curso a un estudiante
+    public void removeCursoManyToMany(){
+        Estudiante estudiante3 = iEstudianteRepository.findById(3).orElse(null);
+        if (estudiante3 != null){
+            Curso cursoEliminar = iCursoRepository.findById(5).orElse(null);
+            Iterator<Curso> cursosEstudiante = estudiante3.getCursos().iterator();
+            while (cursosEstudiante.hasNext()){
+                Curso cursoEncontrado = cursosEstudiante.next();
+                if (cursoEncontrado.getNombre().equals(cursoEliminar.getNombre())){
+                    cursosEstudiante.remove();
+                }
+            }
+            iEstudianteRepository.save(estudiante3);
+            System.out.println("Curso " + cursoEliminar.getNombre() + " eliminado del estudiante " + estudiante3.getNombre());
+        }else{
+            System.out.println("Estudiante no encontrado");
+        }
     }
 }

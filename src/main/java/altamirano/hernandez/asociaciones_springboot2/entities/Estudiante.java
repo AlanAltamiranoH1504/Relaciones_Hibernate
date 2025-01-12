@@ -57,26 +57,37 @@ public class Estudiante {
     }
 
     //ToString
-    @Override
-    public String toString() {
-        return "Estudiante{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", apellidos='" + apellidos + '\'' +
-                ", cursos=" + cursos +
-                '}';
+//    @Override
+//    public String toString() {
+//        return "Estudiante{" +
+//                "id=" + id +
+//                ", nombre='" + nombre + '\'' +
+//                ", apellidos='" + apellidos + '\'' +
+//                ", cursos=" + cursos +
+//                '}';
+//    }
+
+    //Metodo adicionales
+    public void addCurso(Curso curso){
+        cursos.add(curso);
+        curso.getEstudiantes().add(this);
+    }
+    public void removeCurso(Curso curso){
+        cursos.remove(curso);
+        curso.getEstudiantes().remove(this);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Estudiante that = (Estudiante) o;
-        return id == that.id && Objects.equals(nombre, that.nombre) && Objects.equals(apellidos, that.apellidos) && Objects.equals(cursos, that.cursos);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, nombre, apellidos, cursos);
-    }
+//    //Metodos equals y hashcode
+//    @Override
+//    public boolean equals(Object o) {
+//        if (this == o) return true;
+//        if (o == null || getClass() != o.getClass()) return false;
+//        Estudiante that = (Estudiante) o;
+//        return id == that.id && Objects.equals(nombre, that.nombre) && Objects.equals(apellidos, that.apellidos) && Objects.equals(cursos, that.cursos);
+//    }
+//
+//    @Override
+//    public int hashCode() {
+//        return Objects.hash(id, nombre, apellidos, cursos);
+//    }
 }
